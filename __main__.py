@@ -2,6 +2,7 @@ import Puzzle as puz
 import random
 #import matplotlib.pyplot as plt
 import time
+import numpy as np
 
 def create_final(size):
     i = 0
@@ -51,42 +52,65 @@ def create_final(size):
     return puz.Puzzle(tab, j, i, size)
 
 def tabcmp(start, final, size):
+    '''print ("puzzle :")
+    print(np.matrix(start))
+    print ("final :")
+    print(np.matrix(final))
+    print ("size = {}".format(size))'''
     for i in range(size):
         for j in range(size):
             if start[i][j] != final[i][j]:
-                print("{} != {}".format(start[i][j], final[i][j]))
+                #print("{} != {} on i = {} j = {}".format(start[i][j], final[i][j], i, j))
                 return False
     return True
 
 def solve(start, final):
-    start.print_puzzle()
+    open_set = []
+    closed_set = []
+    open_set.append(start)
     while tabcmp(start.tab, final.tab, start.size) == False:
+        start.print_puzzle()
         time.sleep(1)
         score = start.manhattan(final.tab)
         state1 = start.make_right()
-        if state1.manhattan(final.tab) < score:
-            print ("right move")
-            solve(state1, final)
-        state2 = start.make_left()
-        elif state2.manhattan(final.tab) < score:
-            print ("left move")
-            solve(state2, final)
-        state3 = start.make_up()
-        elif state3.manhattan(final.tab) < score:
-            print ("up move")
-            solve(state3, final)
-        state4 = start.make_down()
-        #if state4.manhattan(final.tab) < score:
-        else:
-            print ("down move")
-            solve(state4, final)
+        for i in range(len(open_set)):
+            if tabcmp(open_set[i].tab, state1) == False:
+                if state1.manhattan(final.tab) < score:
+                    print ("right move\n")
+                    start = state1
+                    open_set.append(state1)
+                    continue
+            state2 = start.make_left()
+            if tabcmp(open_set[i].tab, state2) == False:
+                if state2.manhattan(final.tab) < score:
+                    print ("left move\n")
+                    start = state2
+                    open_set.append(state2)
+                    continue
+                state3 = start.make_up()
+            if tabcmp(open_set[i].tab, state3) == False:
+                if state3.manhattan(final.tab) < score:
+                    print ("up move\n")
+                    start = state3
+                    open_set.append(state3)
+                    continue
+                state4 = start.make_down()
+                #if state4.manhattan(final.tab) < score:
+                print ("down move\n")
+                start = state4
+                open_set.append(state4)
+        continue
+    start.print_puzzle()
+    print ("Open Set:")
+    for i in range(len(open_set)):
+        open_set[i].print_puzzle()
 
 def main():
     tab = []
     ran = []
     x = 0
     y = 0
-    size = 2
+    size = 3
     for k in range(size):
         tab.append([0] * size)
     for l in range(size * size):

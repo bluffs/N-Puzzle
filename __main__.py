@@ -64,46 +64,66 @@ def tabcmp(start, final, size):
                 return False
     return True
 
-def solve(start, final):
+def visited(open_set, closed_set, state, size):
+    for state1 in open_set:
+        print("testing")
+        state1.print_puzzle()
+        if tabcmp(state1.tab, state.tab, size) == False:
+            return True
+    for state1 in closed_set:
+        if tabcmp(state1.tab, state.tab, size) == False:
+            return True
+    return False
+
+def best_state(score, list_state, final):
+    choose = 0
+    for state in list_state:
+	scorecmp = state.manhattan(final.tab)
+        if scorecmp < score:
+	    score = scorecmp
+	    choose = state
+    if choose != 0:
+        print ("returning this puzzle")
+        choose.print_puzzle
+	return choose
+    choose = list_state[0]
+    score = list_state[0].manhattan(final.tab)
+    for state in list_state:
+    	scorecmp = state.manhattan(final.tab)
+        if scorecmp <= score:
+    	    score = scorecmp
+	    choose = state
+    print ("returning this puzzle")
+    choose.print_puzzle
+    return choose
+
+def solve(actual, final):
     open_set = []
     closed_set = []
-    open_set.append(start)
-    while tabcmp(start.tab, final.tab, start.size) == False:
-        start.print_puzzle()
+    size = actual.size
+    while tabcmp(actual.tab, final.tab, size) == False:
+        actual.print_puzzle()
         time.sleep(1)
-        score = start.manhattan(final.tab)
-        state1 = start.make_right()
-        for i in range(len(open_set)):
-            if tabcmp(open_set[i].tab, state1) == False:
-                if state1.manhattan(final.tab) < score:
-                    print ("right move\n")
-                    start = state1
-                    open_set.append(state1)
-                    continue
-            state2 = start.make_left()
-            if tabcmp(open_set[i].tab, state2) == False:
-                if state2.manhattan(final.tab) < score:
-                    print ("left move\n")
-                    start = state2
-                    open_set.append(state2)
-                    continue
-                state3 = start.make_up()
-            if tabcmp(open_set[i].tab, state3) == False:
-                if state3.manhattan(final.tab) < score:
-                    print ("up move\n")
-                    start = state3
-                    open_set.append(state3)
-                    continue
-                state4 = start.make_down()
-                #if state4.manhattan(final.tab) < score:
-                print ("down move\n")
-                start = state4
-                open_set.append(state4)
-        continue
-    start.print_puzzle()
-    print ("Open Set:")
-    for i in range(len(open_set)):
-        open_set[i].print_puzzle()
+        closed_set.append(actual)
+        #find another way to clean the list
+        list_state = []
+        state1 = actual.make_right()
+        if visited(open_set, closed_set, state1, size) == False:
+            list_state.append(state1)
+        state2 = actual.make_left()
+        if visited(open_set, closed_set, state2, size) == False:
+            list_state.append(state2)
+        state3 = actual.make_up()
+        if visited(open_set, closed_set, state3, size) == False:
+            list_state.append(state3)
+        state4 = actual.make_down()
+        if visited(open_set, closed_set, state4, size) == False:
+            list_state.append(state4)
+        if not list_state:
+            print("empty list, must go back 1 state")
+        score = actual.manhattan(final.tab)
+        actual = best_state(score, list_state, final)
+
 
 def main():
     tab = []

@@ -61,30 +61,34 @@ def tabcmp(start, final, size):
         for j in range(size):
             if start[i][j] != final[i][j]:
                 #print("{} != {} on i = {} j = {}".format(start[i][j], final[i][j], i, j))
+                # if arrays are different, return False
                 return False
     return True
 
 def visited(open_set, closed_set, state, size):
     for state1 in open_set:
-        print("testing")
+        #print("testing")
         state1.print_puzzle()
-        if tabcmp(state1.tab, state.tab, size) == False:
+        if tabcmp(state1.tab, state.tab, size) == True:
             return True
     for state1 in closed_set:
-        if tabcmp(state1.tab, state.tab, size) == False:
+        if tabcmp(state1.tab, state.tab, size) == True:
             return True
     return False
 
 def best_state(score, list_state, final):
     choose = 0
+    #print ("list of possible states 2 :")
+    #for state in list_state:
+    #    state.print_puzzle()
     for state in list_state:
 	scorecmp = state.manhattan(final.tab)
         if scorecmp < score:
 	    score = scorecmp
 	    choose = state
     if choose != 0:
-        print ("returning this puzzle")
-        choose.print_puzzle
+        #print ("returning this puzzle1")
+        #choose.print_puzzle()
 	return choose
     choose = list_state[0]
     score = list_state[0].manhattan(final.tab)
@@ -93,8 +97,8 @@ def best_state(score, list_state, final):
         if scorecmp <= score:
     	    score = scorecmp
 	    choose = state
-    print ("returning this puzzle")
-    choose.print_puzzle
+    #print ("returning this puzzle2")
+    #choose.print_puzzle()
     return choose
 
 def solve(actual, final):
@@ -103,27 +107,42 @@ def solve(actual, final):
     size = actual.size
     while tabcmp(actual.tab, final.tab, size) == False:
         actual.print_puzzle()
-        time.sleep(1)
+        time.sleep(0.1)
         closed_set.append(actual)
         #find another way to clean the list
         list_state = []
+        #print("CLOSED LIST :")
+        #for state in closed_set:
+        #    state.print_puzzle()
+        #    print("\n")
         state1 = actual.make_right()
         if visited(open_set, closed_set, state1, size) == False:
+            #print("appending make right")
+            #state1.print_puzzle()
             list_state.append(state1)
         state2 = actual.make_left()
         if visited(open_set, closed_set, state2, size) == False:
+            #print("appending make left")
+            #state2.print_puzzle()
             list_state.append(state2)
         state3 = actual.make_up()
         if visited(open_set, closed_set, state3, size) == False:
+            #print("appending make up")
+            #state3.print_puzzle()
             list_state.append(state3)
         state4 = actual.make_down()
         if visited(open_set, closed_set, state4, size) == False:
+            #print("appending make down")
+            #state4.print_puzzle()
             list_state.append(state4)
         if not list_state:
             print("empty list, must go back 1 state")
         score = actual.manhattan(final.tab)
+        #print ("list of possible states 1 :")
+        #for state in list_state:
+        #    state.print_puzzle()
         actual = best_state(score, list_state, final)
-
+    actual.print_puzzle()
 
 def main():
     tab = []

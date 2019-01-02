@@ -1,18 +1,23 @@
 import numpy as np
 
 class Puzzle:
-    def __init__(self, tab, x, y, size):
+    def __init__(self, tab, x, y, size, parent):
         self.tab = tab
         self.x = x
         self.y = y
         self.size = size
+        self.parent = parent
+        if parent != 0:
+            self.g = parent.g + 1
+        else:
+            self.g = 0
 
     def make_right(self):
         if (self.x > 0):
             tab = self.copy_tab()
             tab[self.y][self.x] = tab[self.y][self.x - 1]
             tab[self.y][self.x - 1] = 0
-            return Puzzle(tab, self.x - 1, self.y, self.size)
+            return Puzzle(tab, self.x - 1, self.y, self.size, self)
         else:
             return self
 
@@ -21,7 +26,7 @@ class Puzzle:
             tab = self.copy_tab()
             tab[self.y][self.x] = tab[self.y][self.x + 1]
             tab[self.y][self.x + 1] = 0
-            return Puzzle(tab, self.x + 1, self.y, self.size)
+            return Puzzle(tab, self.x + 1, self.y, self.size, self)
         else:
             return self
 
@@ -30,7 +35,7 @@ class Puzzle:
             tab = self.copy_tab()
             tab[self.y][self.x] = tab[self.y - 1][self.x]
             tab[self.y - 1][self.x] = 0
-            return Puzzle(tab, self.x, self.y - 1, self.size)
+            return Puzzle(tab, self.x, self.y - 1, self.size, self)
         else:
             return self
 
@@ -39,7 +44,7 @@ class Puzzle:
             tab = self.copy_tab()
             tab[self.y][self.x] = tab[self.y + 1][self.x]
             tab[self.y + 1][self.x] = 0
-            return Puzzle(tab, self.x, self.y + 1, self.size)
+            return Puzzle(tab, self.x, self.y + 1, self.size, self)
         else:
             return self
 

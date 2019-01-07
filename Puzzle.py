@@ -79,3 +79,15 @@ class Puzzle:
                 pt = self.find(final, nb)
                 total = total + abs(i - pt[0]) + abs(j - pt[1])
         return total
+
+    def hamming(self, final):
+        total = 0
+        for i in range(self.size):
+            for j in range(self.size):
+                nb = self.tab[i][j]
+                if nb == 0:
+                    continue
+                pt = self.find(final, nb)
+                if i != pt[0] or j != pt[1]:
+                    total = total + 1
+        return total

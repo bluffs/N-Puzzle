@@ -93,19 +93,23 @@ def best_open(open_set):
     if not open_set:
         return 0
     else:
-        best = open_set[0]
+        return open_set[0]
+    '''    best = open_set[0]
     for state in open_set:
         if state.f < best.f:
             best = state
-    return best
+    return best'''
 
 def solve(actual, final):
+    max_open = 0
     open_set = []
     closed_set = []
     path = []
     lowest = 10000
     size = actual.size
     open_set.append(actual)
+    total = 1
+    max_open = 0
     while actual != 0:
         #time.sleep(1)
         #print ("\nopen size = {}".format(len(open_set)))
@@ -113,8 +117,8 @@ def solve(actual, final):
         #print("actual best =")
         if actual.f < lowest:
             lowest = actual.f
-            actual.print_puzzle()
-        print("f = {}, lowest = {}".format(actual.f, lowest))
+            #actual.print_puzzle()
+        #print("f = {}, lowest = {}".format(actual.f, lowest))
         #actual.print_puzzle()
         if actual.f == 0:
             while actual.parent != 0:
@@ -125,26 +129,77 @@ def solve(actual, final):
             for state in path:
                 state.print_puzzle()
                 print("")
+            print("path size = {}".format(len(path)))
+            print("total = {}".format(total))
+            print("max open_set = {}".format(max_open))
+            print("closed_set length = {}".format(len(closed_set)))
             sys.exit()
         open_set.remove(actual)
         closed_set.append(actual)
         state1 = actual.make_right()
         if visited(open_set, closed_set, state1, size) == False:
             state1.f = state1.manhattan(final.tab)
-            open_set.append(state1)
+            i = 0
+            added = False
+            for state in open_set:
+                if state1.f < state.f:
+                    open_set.insert(i, state1)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state1)
+            #open_set.append(state1)
+            total = total + 1
         state2 = actual.make_left()
         if visited(open_set, closed_set, state2, size) == False:
             state2.f = state2.manhattan(final.tab)
-            open_set.append(state2)
+            i = 0
+            added = False
+            for state in open_set:
+                if state2.f < state.f:
+                    open_set.insert(i, state2)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state2)
+            #open_set.append(state2)
+            total = total + 1
         state3 = actual.make_up()
         if visited(open_set, closed_set, state3, size) == False:
             state3.f = state3.manhattan(final.tab)
-            open_set.append(state3)
+            i = 0
+            added = False
+            for state in open_set:
+                if state3.f < state.f:
+                    open_set.insert(i, state3)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state3)
+            #open_set.append(state3)
+            total = total + 1
         state4 = actual.make_down()
         if visited(open_set, closed_set, state4, size) == False:
             state4.f = state4.manhattan(final.tab)
-            open_set.append(state4)
+            i = 0
+            added = False
+            for state in open_set:
+                if state4.f < state.f:
+                    open_set.insert(i, state4)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state4)
+            #open_set.append(state4)
+            total = total + 1
         actual = best_open(open_set)
+        len_open = len(open_set)
+        if max_open < len_open:
+            max_open = len_open
     print("Imposible to solve this N-Puzzle")
 
 def create_random(size):
@@ -166,12 +221,105 @@ def create_random(size):
             ran.remove(nb)
     return (puz.Puzzle(tab, y, x, size, 0))
 
+def create_snail_list(tab, size):
+    nb_list = []
+    n = 0
+    i = 0
+    j = 0
+    way = 0
+    while len(nb_list) < size * size:
+        if way == 0:
+            if j < size - n:
+                nb_list.append(tab[i][j])
+                j = j + 1
+                continue
+            else:
+                way = (way + 1) % 4
+                j = j - 1
+                i = i + 1
+                continue
+        if way == 1:
+            if i < size - n:
+                nb_list.append(tab[i][j])
+                i = i + 1
+                continue
+            else:
+                way = (way + 1) % 4
+                i = i - 1
+                j = j - 1
+                continue
+        if way == 2:
+            if j >= n:
+                nb_list.append(tab[i][j])
+                j = j - 1
+                continue
+            else:
+                way = (way + 1) % 4
+                j = j + 1
+                i = i - 1
+                n = n + 1
+                continue
+        if way == 3:
+            if i >= n:
+                nb_list.append(tab[i][j])
+                i = i - 1
+                continue
+            else:
+                way = (way + 1) % 4
+                i = i + 1
+                j = j + 1
+                continue
+    print nb_list
+    return nb_list
+
+def count_inversions(tab, size):
+    nb_list = []
+    #nb_list = create_snail_list(tab, size)
+    count = 0
+    if (size & 1):
+        nb_list = create_snail_list(tab, size)
+    else:
+        for i in range(size):
+            for j in range(size):
+                nb_list.append(tab[i][j])
+    for i in range(size * size):
+        for j in range(i, size * size):
+            if nb_list[j] != 0 and nb_list[i] > nb_list[j]:
+                count = count + 1
+    return count
+
+def is_solvable(puzzle, size):
+    nb = count_inversions(puzzle.tab, size)
+    print nb
+    if size & 1:
+        if nb & 1 == 0:
+            #print("N is odd and nb is even")
+            return True
+    else:
+        #print("row of 0 = {}".format(size - puzzle.y))
+        if nb & 1 and (size - puzzle.y) & 1 == 0:
+            return True
+        if nb & 1 == 0 and (size - puzzle.y) & 1:
+            return True
+    return False
+
+def check_file(filename):
+    
+
 def main():
-    random.seed(datetime.now())
-    size = 2
+    if len(sys.argv) == 2:
+        #test the input file, start = create_from_file
+        print("argv = {}".format(sys.argv[1]))
+    else:
+        random.seed(datetime.now())
+        size = 4
+        start = create_random(size)
     final = create_final(size)
-    start = create_random(size)
     start.f = start.manhattan(final.tab)
+    if not is_solvable(start, size):
+        print("unsolvable puzzle")
+    else:
+        print("SOLVABLE PUZZLE")
     print("random N-Puzzle :")
     start.print_puzzle()
     print ("\nfinal N-Puzzle :")

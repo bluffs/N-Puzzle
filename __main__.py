@@ -290,7 +290,7 @@ def count_inversions(tab, size):
 
 def is_solvable(puzzle, size):
     nb = count_inversions(puzzle.tab, size)
-    print nb
+    #print nb
     if size & 1:
         if nb & 1 == 0:
             #print("N is odd and nb is even")
@@ -304,12 +304,59 @@ def is_solvable(puzzle, size):
     return False
 
 def check_file(filename):
-    
+    #handle error on open
+    tab = []
+    file = open(filename, 'r')
+    lines = file.readlines()
+    for line in lines:
+        data = (line[:-1].split('#'))
+        if data[0] != '':
+            tab.append(data[0])
+    size = int(tab[0])
+    if len(tab) != int(tab[0]) + 1:
+    #check if tab[0] has no other characters than the number of lines (to make sure it's not a puzzle line)
+        print("bad number of lines")
+        exit()
+    #print tab
+    clean_data = []
+    for line in tab[1:]:
+        data = line.split(' ')
+        line_data = []
+        for d in data:
+            if d != '':
+                line_data.append(int(d))
+        clean_data.append(line_data)
+    #print clean_data
+    x = 0
+    y = 0
+    for nb in range(size * size):
+        found = False
+        for i in range(size):
+            for j in range(size):
+                if clean_data[i][j] == nb:
+                    found = True
+        if not found:
+            print("nb = {} not found".format(nb))
+            exit()
+    for i in range(size):
+        for j in range(size):
+            if clean_data[i][j] == 0:
+                y = i
+                x = j
+            #print clean_data[i][j]
+    file.close()
+    start = puz.Puzzle(clean_data, x, y, size, 0)
+    return start
 
 def main():
+    random.seed(datetime.now())
+    start = 0
+    size = 4
+    #start = create_random(size)
     if len(sys.argv) == 2:
         #test the input file, start = create_from_file
-        print("argv = {}".format(sys.argv[1]))
+        #print("argv = {}".format(sys.argv[1]))
+        start = check_file(sys.argv[1])
     else:
         random.seed(datetime.now())
         size = 4

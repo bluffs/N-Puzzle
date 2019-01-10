@@ -100,7 +100,7 @@ def best_open(open_set):
             best = state
     return best'''
 
-def solve(actual, final):
+def solve(actual, final, func):
     max_open = 0
     open_set = []
     closed_set = []
@@ -138,7 +138,7 @@ def solve(actual, final):
         closed_set.append(actual)
         state1 = actual.make_right()
         if visited(open_set, closed_set, state1, size) == False:
-            state1.f = state1.manhattan(final.tab)
+            state1.f = func(state1, final.tab)
             i = 0
             added = False
             for state in open_set:
@@ -149,11 +149,10 @@ def solve(actual, final):
                 i = i + 1
             if not added:
                 open_set.append(state1)
-            #open_set.append(state1)
             total = total + 1
         state2 = actual.make_left()
         if visited(open_set, closed_set, state2, size) == False:
-            state2.f = state2.manhattan(final.tab)
+            state2.f = func(state2, final.tab)
             i = 0
             added = False
             for state in open_set:
@@ -164,11 +163,10 @@ def solve(actual, final):
                 i = i + 1
             if not added:
                 open_set.append(state2)
-            #open_set.append(state2)
             total = total + 1
         state3 = actual.make_up()
         if visited(open_set, closed_set, state3, size) == False:
-            state3.f = state3.manhattan(final.tab)
+            state3.f = func(state3, final.tab)
             i = 0
             added = False
             for state in open_set:
@@ -179,11 +177,10 @@ def solve(actual, final):
                 i = i + 1
             if not added:
                 open_set.append(state3)
-            #open_set.append(state3)
             total = total + 1
         state4 = actual.make_down()
         if visited(open_set, closed_set, state4, size) == False:
-            state4.f = state4.manhattan(final.tab)
+            state4.f = func(state4, final.tab)
             i = 0
             added = False
             for state in open_set:
@@ -194,7 +191,6 @@ def solve(actual, final):
                 i = i + 1
             if not added:
                 open_set.append(state4)
-            #open_set.append(state4)
             total = total + 1
         actual = best_open(open_set)
         len_open = len(open_set)
@@ -351,7 +347,8 @@ def check_file(filename):
 def main():
     random.seed(datetime.now())
     start = 0
-    size = 4
+    size = 0
+    heuristic_nb = 0
     #start = create_random(size)
     if len(sys.argv) == 2:
         #test the input file, start = create_from_file
@@ -359,10 +356,27 @@ def main():
         start = check_file(sys.argv[1])
     else:
         random.seed(datetime.now())
-        size = 4
+        while size not in range(1, 5):
+            try:
+                size = int(raw_input("What size ?\n"))
+            except ValueError:
+                print("Bad Input")
+                pass
         start = create_random(size)
     final = create_final(size)
-    start.f = start.manhattan(final.tab)
+    heuristics = []
+    heuristics.append([1, puz.Puzzle.manhattan])
+    heuristics.append([2, puz.Puzzle.hamming])
+    heuristics.append([3, puz.Puzzle.manhattan])
+    print("1-Manhattan\n2-Hamming\n3-Linear Conflict/Manhattan")
+    while heuristic_nb not in range(1, 3):
+        try:
+            heuristic_nb = int(raw_input("Which heuristic ?\n"))
+        except ValueError:
+            print("Bad Input")
+            pass
+    heuristic = heuristics[heuristic_nb - 1][1]
+    start.f = heuristic(start, final.tab)
     if not is_solvable(start, size):
         print("unsolvable puzzle")
     else:
@@ -375,7 +389,7 @@ def main():
         input("Press enter to continue")
     except SyntaxError:
         pass
-    solve(start, final)
+    solve(start, final, heuristic)
 
 if __name__ == "__main__":
     main()

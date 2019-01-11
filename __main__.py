@@ -94,11 +94,6 @@ def best_open(open_set):
         return 0
     else:
         return open_set[0]
-    '''    best = open_set[0]
-    for state in open_set:
-        if state.f < best.f:
-            best = state
-    return best'''
 
 def solve(actual, final, func):
     max_open = 0
@@ -265,7 +260,7 @@ def create_snail_list(tab, size):
                 i = i + 1
                 j = j + 1
                 continue
-    print nb_list
+    #print nb_list
     return nb_list
 
 def count_inversions(tab, size):
@@ -363,13 +358,17 @@ def main():
                 print("Bad Input")
                 pass
         start = create_random(size)
+        while not is_solvable(start, size):
+            print("unsolvable puzzle")
+            start = create_random(size)
+        print("SOLVABLE PUZZLE")
     final = create_final(size)
     heuristics = []
     heuristics.append([1, puz.Puzzle.manhattan])
     heuristics.append([2, puz.Puzzle.hamming])
-    heuristics.append([3, puz.Puzzle.manhattan])
+    heuristics.append([3, puz.Puzzle.linear_conflict])
     print("1-Manhattan\n2-Hamming\n3-Linear Conflict/Manhattan")
-    while heuristic_nb not in range(1, 3):
+    while heuristic_nb not in range(1, 4):
         try:
             heuristic_nb = int(raw_input("Which heuristic ?\n"))
         except ValueError:
@@ -377,10 +376,10 @@ def main():
             pass
     heuristic = heuristics[heuristic_nb - 1][1]
     start.f = heuristic(start, final.tab)
-    if not is_solvable(start, size):
+    '''if not is_solvable(start, size):
         print("unsolvable puzzle")
     else:
-        print("SOLVABLE PUZZLE")
+        print("SOLVABLE PUZZLE")'''
     print("random N-Puzzle :")
     start.print_puzzle()
     print ("\nfinal N-Puzzle :")

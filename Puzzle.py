@@ -7,6 +7,10 @@ class Puzzle:
         self.y = y
         self.size = size
         self.parent = parent
+        self.nb_list = []
+        for i in range(self.size):
+            for j in range(self.size):
+                self.nb_list.append(tab[i][j])
         if parent != 0:
             self.g = parent.g + 1
         else:
@@ -101,8 +105,8 @@ class Puzzle:
                 nb_list.append(tab1[j])
             if tab2[j] != 0 and tab2[j] in tab1:
                 nb_listf.append(tab2[j])
-        print(nb_list)
-        print(nb_listf)
+        #print(nb_list)
+        #print(nb_listf)
         for j in range(len(nb_list) - 1):
             nb = nb_list[j]
             nb2 = nb_list[j + 1]
@@ -115,7 +119,7 @@ class Puzzle:
                     place2 = k
             if place > place2:
                 total = total + 1
-        print("total = {}".format(total))
+        #print("total = {}".format(total))
         return total
 
     def linear_conflict(self, final):
@@ -133,7 +137,8 @@ class Puzzle:
                 verti.append(self.tab[i][j])
                 vertif.append(final[i][j])
             total = self.count_conflicts(hori, horif) + self.count_conflicts(verti, vertif)
-        print("total = {}".format(total))
+        #print("total = {}".format(total))
+        total = total + self.manhattan(final)
         return total
         '''print hori
             print horif

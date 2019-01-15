@@ -65,9 +65,14 @@ def visited(open_set, closed_set, state, size):
     for state1 in open_set:
         if tabcmp(state1.tab, state.tab, size) == True:
             return True
-    for state1 in closed_set:
-        if tabcmp(state1.tab, state.tab, size) == True:
-            return True
+    for nb_list in closed_set:
+        for nb in range(size * size):
+            if nb_list[nb] != state.nb_list[nb]:
+                break
+            if nb == (size * size) - 1:
+                return True
+        #if tabcmp(state1.tab, state.tab, size) == True:
+            #return True
     return False
 
 def best_state(score, list_state, final):
@@ -128,9 +133,11 @@ def solve(actual, final, func):
             print("total = {}".format(total))
             print("max open_set = {}".format(max_open))
             print("closed_set length = {}".format(len(closed_set)))
+            print("Initial state :")
+            path[0].print_puzzle()
             sys.exit()
         open_set.remove(actual)
-        closed_set.append(actual)
+        closed_set.append(actual.nb_list)
         state1 = actual.make_right()
         if visited(open_set, closed_set, state1, size) == False:
             state1.f = func(state1, final.tab)
@@ -349,9 +356,10 @@ def main():
         #test the input file, start = create_from_file
         #print("argv = {}".format(sys.argv[1]))
         start = check_file(sys.argv[1])
+        size = start.size
     else:
         random.seed(datetime.now())
-        while size not in range(1, 5):
+        while size not in range(1, 7):
             try:
                 size = int(raw_input("What size ?\n"))
             except ValueError:
@@ -376,10 +384,6 @@ def main():
             pass
     heuristic = heuristics[heuristic_nb - 1][1]
     start.f = heuristic(start, final.tab)
-    '''if not is_solvable(start, size):
-        print("unsolvable puzzle")
-    else:
-        print("SOLVABLE PUZZLE")'''
     print("random N-Puzzle :")
     start.print_puzzle()
     print ("\nfinal N-Puzzle :")

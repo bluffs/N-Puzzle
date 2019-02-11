@@ -346,7 +346,6 @@ def create_snail_list(tab, size):
                 i = i + 1
                 j = j + 1
                 continue
-    #print nb_list
     return nb_list
 
 def count_inversions(tab, size):
@@ -380,6 +379,7 @@ def is_solvable(puzzle, size):
     return False
 
 def check_file(filename):
+    tab= []
     file = open(filename, 'r')
     lines = file.readlines()
     for line in lines:

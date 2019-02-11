@@ -294,11 +294,14 @@ def is_solvable(puzzle, size):
             #print("N is odd and nb is even")
             return True
     else:
+        final_puzzle = create_final(size)
         #print("row of 0 = {}".format(size - puzzle.y))
         if nb & 1 and (size - puzzle.y) & 1 == 0:
-            return True
-        if nb & 1 == 0 and (size - puzzle.y) & 1:
-            return True
+            return False if final_puzzle.y & 1 else True
+        elif nb & 1 == 0 and (size - puzzle.y) & 1:
+            return False if final_puzzle.y & 1 else True
+        else:
+            return True if final_puzzle.y & 1 else False
     return False
 
 def check_file(filename):

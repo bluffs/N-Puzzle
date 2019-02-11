@@ -1,7 +1,6 @@
 import Puzzle as puz
 import sys
 import random
-#import matplotlib.pyplot as plt
 import time
 import numpy as np
 from datetime import datetime
@@ -48,16 +47,12 @@ def create_final(size):
                 else:
                     i = i - 1
                     move = True
-    #plt.plot(tab)
-    #plt.ylabel('Label 1')
-    #plt.show()
     return puz.Puzzle(tab, j, i, size, 0)
 
 def tabcmp(start, final, size):
     for i in range(size):
         for j in range(size):
             if start[i][j] != final[i][j]:
-                #if arrays are different, return False
                 return False
     return True
 
@@ -71,8 +66,6 @@ def visited(open_set, closed_set, state, size):
                 break
             if nb == (size * size) - 1:
                 return True
-        #if tabcmp(state1.tab, state.tab, size) == True:
-            #return True
     return False
 
 def best_state(score, list_state, final):
@@ -100,6 +93,99 @@ def best_open(open_set):
     else:
         return open_set[0]
 
+def greedy_solve(actual, final, func):
+    max_open = 0
+    open_set = []
+    closed_set = []
+    path = []
+    lowest = 10000
+    size = actual.size
+    total = 1
+    max_open = 0
+    while actual != 0:
+        open_set = []
+        if actual.f < lowest:
+            lowest = actual.f
+        if actual.f == 0:
+            while actual.parent != 0:
+                path.insert(0, actual)
+                actual = actual.parent
+            path.insert(0, actual)
+            print("path size = {}".format(len(path)))
+            for state in path:
+                state.print_puzzle()
+                print("")
+            print("path size = {}".format(len(path)))
+            print("total = {}".format(total))
+            print("max open_set = {}".format(max_open))
+            print("closed_set length = {}".format(len(closed_set)))
+            print("Initial state :")
+            path[0].print_puzzle()
+            sys.exit()
+        closed_set.append(actual.nb_list)
+        state1 = actual.make_right()
+        if visited(open_set, closed_set, state1, size) == False:
+            state1.f = func(state1, final.tab)
+            i = 0
+            added = False
+            for state in open_set:
+                if state1.f < state.f:
+                    open_set.insert(i, state1)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state1)
+            total = total + 1
+        state2 = actual.make_left()
+        if visited(open_set, closed_set, state2, size) == False:
+            state2.f = func(state2, final.tab)
+            i = 0
+            added = False
+            for state in open_set:
+                if state2.f < state.f:
+                    open_set.insert(i, state2)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state2)
+            total = total + 1
+        state3 = actual.make_up()
+        if visited(open_set, closed_set, state3, size) == False:
+            state3.f = func(state3, final.tab)
+            i = 0
+            added = False
+            for state in open_set:
+                if state3.f < state.f:
+                    open_set.insert(i, state3)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state3)
+            total = total + 1
+        state4 = actual.make_down()
+        if visited(open_set, closed_set, state4, size) == False:
+            state4.f = func(state4, final.tab)
+            i = 0
+            added = False
+            for state in open_set:
+                if state4.f < state.f:
+                    open_set.insert(i, state4)
+                    added = True
+                    break
+                i = i + 1
+            if not added:
+                open_set.append(state4)
+            total = total + 1
+        tmp = best_open(open_set)
+        if tmp == 0:
+            actual = actual.parent
+        else:
+            actual = tmp
+    print("Imposible to solve this N-Puzzle")
+
 def solve(actual, final, func):
     max_open = 0
     open_set = []
@@ -111,15 +197,8 @@ def solve(actual, final, func):
     total = 1
     max_open = 0
     while actual != 0:
-        #time.sleep(1)
-        #print ("\nopen size = {}".format(len(open_set)))
-        #print ("closed size = {}".format(len(closed_set)))
-        #print("actual best =")
         if actual.f < lowest:
             lowest = actual.f
-            #actual.print_puzzle()
-        #print("f = {}, lowest = {}".format(actual.f, lowest))
-        #actual.print_puzzle()
         if actual.f == 0:
             while actual.parent != 0:
                 path.insert(0, actual)
@@ -267,12 +346,10 @@ def create_snail_list(tab, size):
                 i = i + 1
                 j = j + 1
                 continue
-    #print nb_list
     return nb_list
 
 def count_inversions(tab, size):
     nb_list = []
-    #nb_list = create_snail_list(tab, size)
     count = 0
     if (size & 1):
         nb_list = create_snail_list(tab, size)
@@ -288,14 +365,11 @@ def count_inversions(tab, size):
 
 def is_solvable(puzzle, size):
     nb = count_inversions(puzzle.tab, size)
-    #print nb
     if size & 1:
         if nb & 1 == 0:
-            #print("N is odd and nb is even")
             return True
     else:
         final_puzzle = create_final(size)
-        #print("row of 0 = {}".format(size - puzzle.y))
         if nb & 1 and (size - puzzle.y) & 1 == 0:
             return False if final_puzzle.y & 1 else True
         elif nb & 1 == 0 and (size - puzzle.y) & 1:
@@ -305,8 +379,7 @@ def is_solvable(puzzle, size):
     return False
 
 def check_file(filename):
-    #handle error on open
-    tab = []
+    tab= []
     file = open(filename, 'r')
     lines = file.readlines()
     for line in lines:
@@ -315,10 +388,8 @@ def check_file(filename):
             tab.append(data[0])
     size = int(tab[0])
     if len(tab) != int(tab[0]) + 1:
-    #check if tab[0] has no other characters than the number of lines (to make sure it's not a puzzle line)
         print("bad number of lines")
         exit()
-    #print tab
     clean_data = []
     for line in tab[1:]:
         data = line.split(' ')
@@ -327,7 +398,6 @@ def check_file(filename):
             if d != '':
                 line_data.append(int(d))
         clean_data.append(line_data)
-    #print clean_data
     x = 0
     y = 0
     for nb in range(size * size):
@@ -344,7 +414,6 @@ def check_file(filename):
             if clean_data[i][j] == 0:
                 y = i
                 x = j
-            #print clean_data[i][j]
     file.close()
     start = puz.Puzzle(clean_data, x, y, size, 0)
     return start
@@ -354,10 +423,9 @@ def main():
     start = 0
     size = 0
     heuristic_nb = 0
-    #start = create_random(size)
+    greedy = None
+    print sys.argv[1]
     if len(sys.argv) == 2:
-        #test the input file, start = create_from_file
-        #print("argv = {}".format(sys.argv[1]))
         start = check_file(sys.argv[1])
         size = start.size
     else:
@@ -374,6 +442,13 @@ def main():
             start = create_random(size)
         print("SOLVABLE PUZZLE")
     final = create_final(size)
+    print("Greedy Search ?")
+    while greedy != "y" and greedy != "n":
+        try:
+            greedy = raw_input("y or n ?\n")
+        except ValueError:
+            print("Bad Input")
+            pass
     heuristics = []
     heuristics.append([1, puz.Puzzle.manhattan])
     heuristics.append([2, puz.Puzzle.hamming])
@@ -395,7 +470,10 @@ def main():
         input("Press enter to continue")
     except SyntaxError:
         pass
-    solve(start, final, heuristic)
+    if greedy == "n":
+        solve(start, final, heuristic)
+    else:
+        greedy_solve(start, final, heuristic)
 
 if __name__ == "__main__":
     main()

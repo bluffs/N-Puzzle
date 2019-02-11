@@ -105,8 +105,6 @@ class Puzzle:
                 nb_list.append(tab1[j])
             if tab2[j] != 0 and tab2[j] in tab1:
                 nb_listf.append(tab2[j])
-        #print(nb_list)
-        #print(nb_listf)
         for j in range(len(nb_list) - 1):
             nb = nb_list[j]
             nb2 = nb_list[j + 1]
@@ -119,7 +117,6 @@ class Puzzle:
                     place2 = k
             if place > place2:
                 total = total + 1
-        #print("total = {}".format(total))
         return total
 
     def linear_conflict(self, final):
@@ -130,38 +127,10 @@ class Puzzle:
             verti = []
             vertif = []
             for j in range(self.size):
-                '''check horizontal conflicts'''
                 hori.append(self.tab[i][j])
                 horif.append(final[i][j])
-                '''check vertical conflicts'''
                 verti.append(self.tab[i][j])
                 vertif.append(final[i][j])
             total = self.count_conflicts(hori, horif) + self.count_conflicts(verti, vertif)
-        #print("total = {}".format(total))
         total = total + self.manhattan(final)
         return total
-        '''print hori
-            print horif
-            print("")
-            nb_list = []
-            nb_listf = []
-            for j in range(self.size):
-                if hori[j] != 0 and hori[j] in horif:
-                    nb_list.append(hori[j])
-                if horif[j] != 0 and horif[j] in hori:
-                    nb_listf.append(horif[j])
-            print(nb_list)
-            print(nb_listf)
-            for j in range(len(nb_list) - 1):
-                nb = nb_list[j]
-                nb2 = nb_list[j + 1]
-                place = -1
-                place2 = -1
-                for k in range(len(nb_listf)):
-                    if nb_listf[k] == nb:
-                        place = k
-                    if nb_listf[k] == nb2:
-                        place2 = k
-                if place > place2:
-                    total = total + 1
-        print("total = {}".format(total))'''

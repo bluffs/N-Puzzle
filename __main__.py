@@ -424,10 +424,12 @@ def main():
     size = 0
     heuristic_nb = 0
     greedy = None
-    print sys.argv[1]
     if len(sys.argv) == 2:
         start = check_file(sys.argv[1])
         size = start.size
+        if not is_solvable(start, size):
+            print("unsolvable puzzle")
+            sys.exit()
     else:
         random.seed(datetime.now())
         while size not in range(1, 7):
